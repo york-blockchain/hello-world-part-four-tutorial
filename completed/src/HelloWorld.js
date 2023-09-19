@@ -1,14 +1,26 @@
 import React from "react";
 import { useEffect, useState } from "react";
-import {
-  helloWorldContract,
-  connectWallet,
-  updateMessage,
-  loadCurrentMessage,
-  getCurrentWalletConnected,
-} from "./util/interact.js";
-
+// import {
+//   connectWallet,
+//   updateMessage,
+//   loadCurrentMessage,
+//   getCurrentWalletConnected,
+// } from "./util/interact.js";
 import alchemylogo from "./alchemylogo.svg";
+import { Network, Alchemy, Contract } from "alchemy-sdk";
+
+
+const alchemyKey = process.env.REACT_APP_ALCHEMY_KEY;
+// Optional Config object, but defaults to demo api-key and eth-mainnet.
+const settings = {
+  apiKey: alchemyKey, // Replace with your Alchemy API Key.
+  network: Network.ETH_GOERLI, // Replace with your network.
+};
+
+const alchemy = new Alchemy(settings);
+
+const contractABI = require("./contract-abi.json");
+const contractAddress = "0x6f3f635A9762B47954229Ea479b4541eAF402A6A";
 
 const HelloWorld = () => {
   //state variables
@@ -16,31 +28,34 @@ const HelloWorld = () => {
   const [status, setStatus] = useState("");
   const [message, setMessage] = useState("No connection to the network."); //default message
   const [newMessage, setNewMessage] = useState("");
+  const [helloWorldContractInstance,setHelloWorldContractInstance] = useState();
 
-  //called only once
+  // called only once
   useEffect(async () => {
-    const message = await loadCurrentMessage();
+    const ethersProvider = await alchemy.config.getProvider();
+    const helloWorldContractInstance = new Contract(contractAddress, contractABI, ethersProvider)
+    // const message = await loadCurrentMessage(helloWorldContractInstance);
     setMessage(message);
-    addSmartContractListener();
+    // addSmartContractListener();
+    setHelloWorldContractInstance(helloWorldContractInstance)
+    // const { address, status } = await getCurrentWalletConnected();
 
-    const { address, status } = await getCurrentWalletConnected();
-
-    setWallet(address);
+    // setWallet(address);
     setStatus(status);
 
     addWalletListener();
   }, []);
 
   function addSmartContractListener() {
-    helloWorldContract.events.UpdatedMessages({}, (error, data) => {
-      if (error) {
-        setStatus("😥 " + error.message);
-      } else {
-        setMessage(data.returnValues[1]);
-        setNewMessage("");
-        setStatus("🎉 Your message has been updated!");
-      }
-    });
+    // helloWorldContractInstance.events.UpdatedMessages({}, (error, data) => {
+    //   if (error) {
+    //     setStatus("😥 " + error.message);
+    //   } else {
+    //     setMessage(data.returnValues[1]);
+    //     setNewMessage("");
+    //     setStatus("🎉 Your message has been updated!");
+    //   }
+    // });
   }
 
   function addWalletListener() {
@@ -69,13 +84,13 @@ const HelloWorld = () => {
   }
 
   const connectWalletPressed = async () => {
-    const walletResponse = await connectWallet();
-    setStatus(walletResponse.status);
-    setWallet(walletResponse.address);
+    // const walletResponse = await connectWallet();
+    // setStatus(walletResponse.status);
+    // setWallet(walletResponse.address);
   };
 
   const onUpdatePressed = async () => {
-    const { status } = await updateMessage(walletAddress, newMessage);
+    // const { status } = await updateMessage(helloWorldContractInstance,walletAddress, newMessage);
     setStatus(status);
   };
 
