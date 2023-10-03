@@ -16,6 +16,7 @@ const HelloWorld = () => {
   const [status, setStatus] = useState("");
   const [message, setMessage] = useState("No connection to the network."); //default message
   const [newMessage, setNewMessage] = useState("");
+  const [helloWorldContractInstance, setHelloWorldContractInstance] = useState();
 
   //called only once
   useEffect(async () => {
