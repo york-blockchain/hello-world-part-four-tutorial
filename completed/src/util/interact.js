@@ -1,8 +1,3 @@
-require("dotenv").config();
-
-const contractAddress = "0x6f3f635A9762B47954229Ea479b4541eAF402A6A";
-
-
 export const loadCurrentMessage = async (helloWorldContractInstance) => {
   const message = await helloWorldContractInstance.message();
   return message;
@@ -33,7 +28,7 @@ export const connectWallet = async () => {
           <p>
             {" "}
             🦊{" "}
-            <a target="_blank" href={`https://metamask.io/download.html`}>
+            <a target="_blank" rel="noreferrer" href={`https://metamask.io/download.html`}>
               You must install Metamask, a virtual Ethereum wallet, in your
               browser.
             </a>
@@ -75,7 +70,7 @@ export const getCurrentWalletConnected = async () => {
           <p>
             {" "}
             🦊{" "}
-            <a target="_blank" href={`https://metamask.io/download.html`}>
+            <a target="_blank" rel="noreferrer" href={`https://metamask.io/download.html`}>
               You must install Metamask, a virtual Ethereum wallet, in your
               browser.
             </a>
@@ -86,7 +81,7 @@ export const getCurrentWalletConnected = async () => {
   }
 };
 
-export const updateMessage = async (helloWorldContractInstance,address, message) => {
+export const updateMessage = async (helloWorldContractInstance, address, message) => {
   //input error handling
   if (!window.ethereum || address === null) {
     return {
@@ -100,11 +95,14 @@ export const updateMessage = async (helloWorldContractInstance,address, message)
       status: "❌ Your message cannot be an empty string.",
     };
   }
+  const { data, to } = await helloWorldContractInstance.populateTransaction.update(message)
+  console.log("to ",to)
+  console.log("from ",address)
   //set up transaction parameters
   const transactionParameters = {
-    to: contractAddress, // Required except during contract publications.
+    to, // Required except during contract publications.
     from: address, // must match user's active address.
-    data: helloWorldContractInstance.methods.update(message).encodeABI(),
+    data,
   };
 
   //sign the transaction
@@ -117,7 +115,7 @@ export const updateMessage = async (helloWorldContractInstance,address, message)
       status: (
         <span>
           ✅{" "}
-          <a target="_blank" href={`https://ropsten.etherscan.io/tx/${txHash}`}>
+          <a target="_blank" rel="noreferrer" href={`https://goerli.etherscan.io/tx/${txHash}`}>
             View the status of your transaction on Etherscan!
           </a>
           <br />
